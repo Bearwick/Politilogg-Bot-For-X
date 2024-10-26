@@ -90,5 +90,3 @@ def getTweet(id):
     print("Response code: {}".format(response.status_code))
     json_response = response.json()
     print(json.dumps(json_response, indent=4, sort_keys=True))
-
-

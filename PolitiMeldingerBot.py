@@ -1,7 +1,7 @@
-from PolitiloggAPI import fetch_politilogg_feed, MessageEntry
+import schedule
+from PolitiloggAPI import fetch_politilogg_feed
 from Storage import getTweet, write_json
 from XAPI import post_tweet
-import schedule
 import time
 
 politilogg_feed_url = "https://api.politiet.no/politiloggen/v1/atom?districts="
@@ -45,24 +45,24 @@ def post_feed(police_feed):
             continue
 
 
-# Main function to fetch the police feed
-def main():
+def main(event=None, context=None):
     police_feed = fetch_police_feed()
+    print("success")
     rate_limit_reached = post_feed(police_feed)
     if rate_limit_reached:
-        #sleep until 6 am next day since the rate limit is 50 requests
+        # Sleep until 6 am next day since the rate limit is 50 requests
         current_time = time.localtime()
         if current_time.tm_hour >= 6:
             time.sleep((30 - current_time.tm_min) * 60)
         else:
             time.sleep((6 - current_time.tm_hour) * 3600)
-    
 
 if __name__ == "__main__":
-    # Schedule the task to run every 5 seconds
-    schedule.every(1).seconds.do(main)
+    # Schedule the task to run every 1 minute
+    schedule.every(1).minutes.do(main)
 
     # Run the scheduled tasks indefinitely
     while True:
         schedule.run_pending()
         time.sleep(1)
+

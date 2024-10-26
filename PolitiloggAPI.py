@@ -30,7 +30,7 @@ def fetch_politilogg_feed(feed_url):
 
     # List to store AtomEntry objects
     entries_list = []
-
+    print(feed)
     # Check if the feed was parsed correctly
     if feed.bozo == 1:
         print("Failed to parse feed.")

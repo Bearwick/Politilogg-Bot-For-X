@@ -2,3 +2,5 @@
 police_tweet_map.json
 .DS_Store
 __pycache__/
+lambda_function.zip
+/package
