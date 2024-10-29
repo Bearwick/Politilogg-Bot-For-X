@@ -50,12 +50,22 @@ def main(event=None, context=None):
     print("success")
     rate_limit_reached = post_feed(police_feed)
     if rate_limit_reached:
-        # Sleep until 6 am next day since the rate limit is 50 requests
+        # Get current time
         current_time = time.localtime()
+        
+        # Calculate sleep duration to 6 am next day if current time is after 6 am
         if current_time.tm_hour >= 6:
-            time.sleep((30 - current_time.tm_min) * 60)
+            hours_until_midnight = 24 - current_time.tm_hour  # Remaining hours today
+            minutes_until_next_hour = 60 - current_time.tm_min if current_time.tm_min > 0 else 0
+            sleep_duration = (hours_until_midnight + 6) * 3600 + minutes_until_next_hour * 60
         else:
-            time.sleep((6 - current_time.tm_hour) * 3600)
+            # If before 6 am, calculate sleep to reach 6 am the same day
+            sleep_duration = (6 - current_time.tm_hour) * 3600 - current_time.tm_min * 60
+        
+        # Ensure sleep duration is positive
+        if sleep_duration > 0:
+            print("Sleeping for " + str(sleep_duration // 60) + " minutes...")
+            time.sleep(sleep_duration)
 
 if __name__ == "__main__":
     # Schedule the task to run every 1 minute
