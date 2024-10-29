@@ -47,7 +47,6 @@ def post_feed(police_feed):
 
 def main(event=None, context=None):
     police_feed = fetch_police_feed()
-    print("success")
     rate_limit_reached = post_feed(police_feed)
     if rate_limit_reached:
         # Get current time
