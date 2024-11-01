@@ -1,3 +1,4 @@
+import time
 from requests_oauthlib import OAuth1Session
 import os
 import json
@@ -59,7 +60,14 @@ def post_tweet(payload):
     )
 
     if response.status_code == 429:
-        return False
+        print("Request limit reached: {} {}".format(response.status_code, response.text))
+        # get UTC epoch time now
+        epoch_time_now = time.time()
+        # get UTC epoch time when rate limit will reset
+        epoch_time_reset = int(response.headers["x-rate-limit-reset"])
+        # calculate the difference in seconds
+        sleep_duration = epoch_time_reset - epoch_time_now
+        return False, sleep_duration
 
     elif response.status_code != 201:
         raise Exception(
@@ -71,7 +79,8 @@ def post_tweet(payload):
     # Saving the response as JSON
     json_response = response.json()
     print(json.dumps(json_response, indent=4, sort_keys=True))
-    return json_response.get("data", {}).get("id")
+    sleep_duration = 60
+    return json_response.get("data", {}).get("id"), sleep_duration
 
 def commentOnTweet(payload, tweetId):
     return

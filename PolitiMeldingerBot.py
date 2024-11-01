@@ -31,10 +31,11 @@ def post_feed(police_feed):
         tweet_data = getTweet(entry.entry_id)
         if tweet_data == None:
             tweet = create_tweet(entry)
-            tweet_id = post_tweet(tweet)
+            tweet_id, sleep_duration = post_tweet(tweet)
             if tweet_id == False:
-                return True
+                return sleep_duration
             write_json(entry.entry_id, tweet_id)
+            return sleep_duration
         
         else:
             # Not implemented since paid higher API level was required for GET requests
@@ -44,34 +45,10 @@ def post_feed(police_feed):
             continue
 
 
-def getSleepTime():
-        # Get current time
-    current_time = time.localtime()
-    
-    # Calculate sleep duration to 6 am next day if current time is after 6 am
-    if current_time.tm_hour >= 6:
-        hours_until_midnight = 24 - current_time.tm_hour  # Remaining hours today
-        minutes_until_next_hour = 60 - current_time.tm_min if current_time.tm_min > 0 else 0
-        sleep_duration = (hours_until_midnight + 6) * 3600 + minutes_until_next_hour * 60
-    else:
-        # If before 6 am, calculate sleep to reach 6 am the same day
-        sleep_duration = (6 - current_time.tm_hour) * 3600 - current_time.tm_min * 60
-    
-    # Ensure sleep duration is positive
-    if sleep_duration > 0:
-        print("Sleeping for " + str(sleep_duration // 60) + " minutes...")
-        return sleep_duration
-    else:
-        return 0
-
-
 if __name__ == "__main__":
     while True:
         police_feed = fetch_police_feed()
-        rate_limit_reached = post_feed(police_feed)
-
-        if rate_limit_reached:
-            time.sleep(getSleepTime())
-        else:
-            time.sleep(60)
+        sleep_duration = post_feed(police_feed)
+        print("sleeping for {} minutes".format(sleep_duration//60))
+        time.sleep(sleep_duration)
 
